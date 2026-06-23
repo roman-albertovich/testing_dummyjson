@@ -1,0 +1,672 @@
+{
+  "info": {
+    "_postman_id": "25a79cc4-b2e1-4f90-81e3-27addffc8014",
+    "name": "Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "7923742"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"accessToken not null\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.accessToken).to.not.be.null;",
+              "});",
+              "",
+              "",
+              "const responseJson = pm.response.text();",
+              "pm.collectionVariables.set(\"accessToken\", responseJson.accessToken)",
+              "pm.collectionVariables.set(\"user_id\", responseJson.id)"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"emilys\",\n    \"password\": \"emilyspass\",\n    \"expiresInMins\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://dummyjson.com/auth/login",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Auth 400 bad password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "pm.test(\"Error message: \\\"Invalid credentials\\\"\", function () {",
+              "    pm.expect(pm.response.text()).to.include(\"Invalid credentials\");",
+              "});",
+              "pm.test(\"accessToken not exist\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.accessToken).to.not.exist;",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"emilys\",\n    \"password\": \"emilyspassbad\",\n    \"expiresInMins\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://dummyjson.com/auth/login",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get_user_info",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://dummyjson.com/auth/me",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "auth",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get_user_info_without_token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 401\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "pm.test(\"Response body contains 'Access Token is required'\", function () {",
+              "    pm.expect(pm.response.text()).to.include(\"Access Token is required\");",
+              "    });"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://dummyjson.com/auth/me",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "auth",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "carts_user_200",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://dummyjson.com/carts/user/{{user_id}}",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "carts",
+            "user",
+            "{{user_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "carts_id_200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://dummyjson.com/carts/1",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "carts",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "carts_add_201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"ID is not null\", function () {",
+              "    pm.response.to.have.jsonBody('id');",
+              "    });",
+              "",
+              "pm.test(\"User ID is not null\", function () {",
+              "    pm.expect(pm.response.json().userId).to.not.be.null;",
+              "    });",
+              "",
+              "pm.test(\"User ID matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().userId).to.eql(pm.environment.get(\"user_id\"));",
+              "});",
+              "",
+              "",
+              "const responseJson = pm.response.text();",
+              "pm.collectionVariables.set(\"cart_ID\", responseJson.id)",
+              "pm.collectionVariables.set(\"totalProducts\", responseJson.totalProducts)",
+              "pm.collectionVariables.set(\"totalQuantity\", responseJson.totalQuantity)",
+              "pm.collectionVariables.set(\"total\", responseJson.total)"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"userId\": {{user_id}},\n    \"products\":[\n        {\n            \"id\":\"144\",\n            \"quantity\":\"4\"\n        },\n        {\n             \"id\":\"98\",\n            \"quantity\":\"41\"\n        }\n    ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://dummyjson.com/carts/add",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "carts",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get_card_by_id",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Check if the response status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    });",
+              "",
+              "pm.test(\"cart_ID  matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().userId).to.eql(pm.environment.get(\"cart_ID\"));",
+              "});",
+              "pm.test(\"User ID matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().userId).to.eql(pm.environment.get(\"user_id\"));",
+              "});",
+              "pm.test(\"total matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().userId).to.eql(pm.environment.get(\"total\"));",
+              "});",
+              "pm.test(\"discountedTotal matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().userId).to.eql(pm.environment.get(\"discountedTotal\"));",
+              "});",
+              "pm.test(\"totalProducts matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().userId).to.eql(pm.environment.get(\"totalProducts\"));",
+              "});",
+              "pm.test(\"totalQuantity matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().userId).to.eql(pm.environment.get(\"totalQuantity\"));",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://dummyjson.com/carts/{{cart_ID}}",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "carts",
+            "{{cart_ID}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get_card_with_uncorrected_id",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test (\"Status code is 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "    });",
+              "pm.test(\"Cart with id {{cart_ID}} not found\", function () {",
+              "    pm.expect(pm.response.text()).to.include(\"not found\");",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://dummyjson.com/carts/{{cart_ID}}",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "carts",
+            "{{cart_ID}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get_card_by_user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"User ID matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().carts[0].userId).to.eql(pm.environment.get(\"user_id\"));",
+              "});",
+              "pm.test(\"totalProducts products matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().carts[0].totalProducts).to.eql(pm.environment.get(\"totalProducts\"));",
+              "    });",
+              "pm.test(\"totalQuantity matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().carts[0].totalQuantity).to.eql(pm.environment.get(\"totalQuantity\"));",
+              "    });",
+              "pm.test(\"discountedTotal matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().carts[0].discountedTotal).to.eql(pm.environment.get(\"discountedTotal\"));",
+              "    });",
+              "pm.test(\"Total matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().carts[0].total).to.eql(pm.environment.get(\"total_sum\"));",
+              "    });"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://dummyjson.com/carts/user/{{user_id}}",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "carts",
+            "user",
+            "{{user_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "patch_carts",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Cart ID matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().carts[0].id).to.eql(pm.environment.get(\"cart_ID\"));",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"merge\": true,\n    \"products\":\n    [\n        {\n            \"id\": 1,\n            \"quantity\": 1\n        }\n    ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://dummyjson.com/carts/1",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "carts",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete_cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Cart ID matches the environment variable\", function () {",
+              "    pm.expect(pm.response.json().carts[0].userId).to.eql(pm.environment.get(\"cart_ID\"));",
+              "});",
+              "pm.test(\"Status is marked as deleted\", function () {",
+              "    pm.expect(pm.response.json().isDeleted).to.eql(true);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://dummyjson.com/carts/1",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "carts",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "cart_ID",
+      "value": ""
+    },
+    {
+      "key": "totalProducts",
+      "value": ""
+    },
+    {
+      "key": "totalQuantity",
+      "value": ""
+    },
+    {
+      "key": "total",
+      "value": ""
+    }
+  ]
+}
