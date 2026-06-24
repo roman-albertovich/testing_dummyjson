@@ -7,6 +7,54 @@
   },
   "item": [
     {
+      "name": "get_user_info_without_token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 401\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "pm.test(\"Response body contains 'Access Token is required'\", function () {",
+              "    pm.expect(pm.response.text()).to.include(\"Access Token is required\");",
+              "    });"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://dummyjson.com/auth/me",
+          "protocol": "https",
+          "host": [
+            "dummyjson",
+            "com"
+          ],
+          "path": [
+            "auth",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Auth",
       "event": [
         {
@@ -138,54 +186,6 @@
             {
               "key": "token",
               "value": "{{accessToken}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "https://dummyjson.com/auth/me",
-          "protocol": "https",
-          "host": [
-            "dummyjson",
-            "com"
-          ],
-          "path": [
-            "auth",
-            "me"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "get_user_info_without_token",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Status 401\", function () {",
-              "    pm.response.to.have.status(401);",
-              "});",
-              "pm.test(\"Response body contains 'Access Token is required'\", function () {",
-              "    pm.expect(pm.response.text()).to.include(\"Access Token is required\");",
-              "    });"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "",
               "type": "string"
             }
           ]
@@ -387,19 +387,19 @@
               "    });",
               "",
               "pm.test(\"cart_ID  matches the collection variable\", function () {",
-              "    pm.expect(pm.response.json().userId).to.eql(pm.collectionVariables.get(\"cart_ID\"));",
+              "    pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get(\"cart_ID\"));",
               "});",
               "pm.test(\"User ID matches the collection variable\", function () {",
               "    pm.expect(pm.response.json().userId).to.eql(pm.collectionVariables.get(\"user_id\"));",
               "});",
               "pm.test(\"discountedTotal matches the collection variable\", function () {",
-              "    pm.expect(pm.response.json().userId).to.eql(pm.collectionVariables.get(\"discountedTotal\"));",
+              "    pm.expect(pm.response.json().discountedTotal).to.eql(pm.collectionVariables.get(\"discountedTotal\"));",
               "});",
               "pm.test(\"totalProducts matches the collection variable\", function () {",
-              "    pm.expect(pm.response.json().userId).to.eql(pm.collectionVariables.get(\"totalProducts\"));",
+              "    pm.expect(pm.response.json().totalProducts).to.eql(pm.collectionVariables.get(\"totalProducts\"));",
               "});",
               "pm.test(\"totalQuantity matches the collection variable\", function () {",
-              "    pm.expect(pm.response.json().userId).to.eql(pm.collectionVariables.get(\"totalQuantity\"));",
+              "    pm.expect(pm.response.json().totalQuantity).to.eql(pm.collectionVariables.get(\"totalQuantity\"));",
               "});",
               ""
             ],
@@ -558,10 +558,13 @@
               "    pm.response.to.have.status(200);",
               "});",
               "",
-              "pm.test(\"Cart ID matches the collection variable\", function () {",
-              "    pm.expect(pm.response.json().carts[0].id).to.eql(pm.collectionVariables.get(\"cart_ID\"));",
-              "});",
-              ""
+              "",
+              "pm.test(\"Cart total matches the collection variable\", function () {",
+              "    const requestData = JSON.parse(pm.request.body.raw);",
+              "    const responseData = pm.response.json()",
+              "    pm.expect(responseData.products[0].id).to.eql(requestData.products[0].id);",
+              "    pm.expect(responseData.products[0].quantity).to.eql(requestData.products[0].quantity);",
+              "    });"
             ],
             "type": "text/javascript",
             "packages": {},
@@ -584,7 +587,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"merge\": true,\n    \"products\":\n    [\n        {\n            \"id\": 1,\n            \"quantity\": 1\n        }\n    ]\n}",
+          "raw": "{\n    \"merge\": false,\n    \"products\":\n    [\n        {\n            \"id\": 1,\n            \"quantity\": 1\n        }\n    ]\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -617,9 +620,6 @@
               "    pm.response.to.have.status(200);",
               "});",
               "",
-              "pm.test(\"Cart ID matches the collection variable\", function () {",
-              "    pm.expect(pm.response.json().carts[0].userId).to.eql(pm.collectionVariables.get(\"cart_ID\"));",
-              "});",
               "pm.test(\"Status is marked as deleted\", function () {",
               "    pm.expect(pm.response.json().isDeleted).to.eql(true);",
               "});"
